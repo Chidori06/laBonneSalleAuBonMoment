@@ -6,29 +6,29 @@ import ReservationCard from "../composants/ReservationCard";
 import { Link } from "react-router";
 
 
-function ViewReservation(){
-    const {user, userList,getUserList}=useContext(UserContext);
-    useEffect(()=>{getUserList()},[]);
-    const {getReservation,postReservation, putReservation, deleteReservation,getReservationList,reservationList,...reservation} = useContext(ReservationContext);
-    useEffect(()=>{getReservationList()},[reservationList]);
+function ViewReservation() {
+    const { user, userList, getUserList } = useContext(UserContext);
+    useEffect(() => { getUserList() }, []);
+    const { getReservation, postReservation, putReservation, deleteReservation, getReservationList, reservationList, ...reservation } = useContext(ReservationContext);
+    useEffect(() => { getReservationList() }, []);
     const [userReservationList, setUserReservationList] = useState<Reservation[]>([]);
-    useEffect(()=>{
-        if(!user) {
+    useEffect(() => {
+        if (!user) {
             return;
         }
-        reservationList.forEach((res)=>{
-            if(res.user_id==user.id) {
-            setUserReservationList([...userReservationList,res])
+        reservationList.forEach((res) => {
+            if (res.userId == user.id) {
+                setUserReservationList([...userReservationList, res])
             }
         })
-    },[reservationList])
+    }, [reservationList])
 
-    return(
+    return (
         <>
-        <Link to="/createreservation"><button className="rounded-md bg-black px-3 py-2 text-sm border-[#FFFFFF] border-2 font-semibold text-white">Réserver une salle</button></Link>
-        {reservationList.map((reservation)=>(
-            <ReservationCard key={reservation.id} reservation={reservation} onChange={getReservationList}/>
-        ))}
+            <Link to="/createreservation"><button className="rounded-md bg-black px-3 py-2 text-sm border-[#FFFFFF] border-2 font-semibold text-white">Réserver une salle</button></Link>
+            {reservationList.map((reservation) => (
+                <ReservationCard key={reservation.id} reservation={reservation} onChange={getReservationList} />
+            ))}
         </>
     );
 }

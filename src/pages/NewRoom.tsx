@@ -7,12 +7,12 @@ type RoomFormData = {
 };
 
 function NewRoom() {
-    const { register, handleSubmit, formState: { errors, isValid }, reset } = useForm<RoomFormData>({mode: "onChange"});
+    const { register, handleSubmit, formState: { errors, isValid }, reset } = useForm<RoomFormData>({ mode: "onChange" });
     const [success, setSuccess] = useState(false);
-    
+
     async function onSubmit(data: RoomFormData) {
         try {
-            const response = await fetch("http://localhost:3000/salles", {
+            const response = await fetch("http://localhost:3000/rooms", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

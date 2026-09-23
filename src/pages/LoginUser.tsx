@@ -20,7 +20,8 @@ function LoginUser() {
         try {
             //Empêche l'email et le mot de passe en clair dans l'url
             const response = await fetch(
-                `http://localhost:3000/users?email=${encodeURIComponent(data.email)}&password=${encodeURIComponent(data.password)}`
+                //  `http://localhost:3000/users?email=${encodeURIComponent(data.email)}&password=${encodeURIComponent(data.password)}`
+                `http://localhost:3000/api/users`
             );
 
             if (!response.ok) {

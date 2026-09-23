@@ -5,24 +5,13 @@ import { ReservationContext } from "../context/ReservationContext";
 
 interface ReservationCardProps {
     reservation: Reservation;
-    onChange:()=>void;
+    onChange: () => void;
 }
 
 function ReservationCard({ reservation, onChange }: ReservationCardProps) {
     const navigate = useNavigate();
-    const [salleName, setSalleName] = useState("");
 
     const { deleteReservation } = useContext(ReservationContext);
-
-    useEffect(() => {
-        const fetchSalle = async () => {
-            const response = await fetch(`http://localhost:3000/salles/${reservation.salle_id}`);
-            const data = await response.json();
-            setSalleName(data.name);
-        };
-
-        fetchSalle();
-    }, [reservation.salle_id]);
 
     function handleModifier() {
         navigate(`/reservations/${reservation.id}`);
@@ -35,9 +24,9 @@ function ReservationCard({ reservation, onChange }: ReservationCardProps) {
 
     return (
         <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-            <p className="text-sm text-gray-500">Salle : <span className="font-medium text-gray-900">{salleName}</span></p>
-            <p className="text-sm text-gray-500">Date de début : <span className="font-medium text-gray-900">{reservation.date_debut}</span></p>
-            <p className="text-sm text-gray-500">Date de fin : <span className="font-medium text-gray-900">{reservation.date_fin}</span></p>
+            <p className="text-sm text-gray-500">Salle : <span className="font-medium text-gray-900">{reservation.room.name}</span></p>
+            <p className="text-sm text-gray-500">Date de début : <span className="font-medium text-gray-900">{reservation.dateDebut}</span></p>
+            <p className="text-sm text-gray-500">Date de fin : <span className="font-medium text-gray-900">{reservation.dateFin}</span></p>
 
             <div className="mt-4 flex gap-2">
                 <button
