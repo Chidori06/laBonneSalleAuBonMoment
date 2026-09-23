@@ -12,7 +12,7 @@ function NewRoom() {
 
     async function onSubmit(data: RoomFormData) {
         try {
-            const response = await fetch("http://localhost:3000/rooms", {
+            const response = await fetch("http://localhost:3000/api/rooms", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -53,7 +53,7 @@ function NewRoom() {
                 <div className="flex flex-col items-center gap-2">
                     <div className="flex items-center gap-6">
                         <label className="text-black bg-[#D9D9D9] p-2 w-[84px]">Capacité</label>
-                        <input className="bg-white m-2 p-2 w-[212px]" type="number" {...register("capacity", { required: "La capacité ne doit pas être nulle" })} />
+                        <input className="bg-white m-2 p-2 w-[212px]" type="number" {...register("capacity", { required: "La capacité ne doit pas être nulle", valueAsNumber: true })} />
                     </div>
                     {errors.capacity && <p className="text-black-500 font-bold text-sm">{errors.capacity.message}</p>}
                 </div>

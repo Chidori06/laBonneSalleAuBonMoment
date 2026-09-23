@@ -14,16 +14,16 @@ function AppRoutes() {
     return (
         <Routes>
             <Route path="/login" element={<LoginUser />} />
-            {/* <Route element={<ProtectedRoute />}> */}
-            <Route path="/dashboard/:role" element={<Dashboard />} />
-            <Route path="/NewRoom" element={<NewRoom />} />
-            <Route path="/signin" element={<FormCompte />} />
-            <Route path="/createreservation" element={<CreateReservation />} />
-            <Route path="/viewreservation" element={<ViewReservation />} />
-            <Route path="/reservations/:id" element={<UpdateReservation />} />
-            <Route path="/userlist" element={<UserList />} />
-            <Route path="/roomlist" element={<RoomList />} />
-            {/* </Route> */}
+            <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard/:role" element={<Dashboard />} />
+                <Route path="/NewRoom" element={<NewRoom />} />
+                <Route path="/signin" element={<FormCompte />} />
+                <Route path="/createreservation" element={<CreateReservation />} />
+                <Route path="/viewreservation" element={<ViewReservation />} />
+                <Route path="/reservations/:id" element={<UpdateReservation />} />
+                <Route path="/userlist" element={<UserList />} />
+                <Route path="/roomlist" element={<RoomList />} />
+            </Route>
         </Routes>
     );
 }

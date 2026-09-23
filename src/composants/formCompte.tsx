@@ -1,15 +1,32 @@
-
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { User } from "../context/UserContext";
 
 function FormCompte() {
 
-    const checkEmailAvailable = async (email: string): Promise<[]> => {
-        const response = await fetch(`http://localhost:3000/users?email=${email}`);
+    // const checkEmailAvailable = async (email: string): Promise<User[]> => {
+    //     const response = await fetch(`http://localhost:3000/api/users?email=${email}`);
+    //     const data = await response.json();
+    //     return data;
+    // }
+    const checkEmailAvailable = async (email: string) => {
+        console.log("📧 EMAIL ENVOYÉ :", email);
+
+        const url = `http://localhost:3000/api/users?email=${encodeURIComponent(email)}`;
+
+        console.log("🌐 URL :", url);
+
+        const response = await fetch(url);
+
+        console.log("📡 STATUS :", response.status);
+
         const data = await response.json();
+
+        console.log("📦 RÉPONSE :", data);
+
         return data;
-    }
+    };
 
     const compteSchema = z.object({
         lastname: z.string()
@@ -21,14 +38,27 @@ function FormCompte() {
             .string()
             .email("Veuillez entrer un email valide")
             .min(5, "Votre email doit contenir au moins 5 caractères")
+            // .refine(
+            //     async (email) => {
+            //         const available = await checkEmailAvailable(email);
+            //         if (available.length === 0) {
+            //             return available;
+            //         }
+            //     },
+            //     { message: "Cet email est déjà utilisé" })
             .refine(
                 async (email) => {
-                    const available = await checkEmailAvailable(email);
-                    if (available.length == 0) {
-                        return available;
-                    }
+                    const users = await checkEmailAvailable(email);
+
+                    console.log("6 - Résultat pour Zod :", users);
+
+                    return users.length === 0;
                 },
-                { message: "Cet email est déjà utilisé" })
+                {
+                    message: "Cet email est déjà utilisé"
+                }
+            )
+
         ,
         password: z
             .string()
@@ -47,28 +77,56 @@ function FormCompte() {
         resolver: zodResolver(compteSchema),
     });
 
+    // async function onSubmit(data) {
+    //     console.log(data);
+
+    //     try {
+    //         const response = await fetch('http://localhost:3000/api/users', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify(data)
+    //         });
+
+    //         if (!response.ok) {
+    //             throw new Error(`HTTP error! status: ${response.status}`);
+    //         }
+
+    //         const data2 = await response.json();
+    //         console.log(data2);
+    //     } catch (error) {
+    //         console.error('Error:', error);
+    //     }
+    // };
+
     async function onSubmit(data) {
-        console.log(data);
+        console.log("DONNÉES ENVOYÉES :", data);
 
         try {
-            const response = await fetch('http://localhost:3000/users', {
-                method: 'POST',
+            const response = await fetch("http://localhost:3000/api/users", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json'
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
             });
 
+            const result = await response.json();
+
+            console.log("STATUS :", response.status);
+            console.log("RÉPONSE BACKEND :", result);
+
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(result.message || "Erreur lors de la création");
             }
 
-            const data2 = await response.json();
-            console.log(data2);
+            console.log("Utilisateur créé :", result);
+
         } catch (error) {
-            console.error('Error:', error);
+            console.error("Erreur :", error);
         }
-    };
+    }
 
 
     return (
@@ -122,7 +180,7 @@ function FormCompte() {
                                         <option value="1">Administrateur</option>
                                         <option value="3">Apprenant</option>
                                     </select>
-                                    {errors.option && (<p>{errors.option.message}</p>)}
+                                    {errors.roleId && (<p>{errors.roleId.message}</p>)}
 
                                 </div>
                             </div>

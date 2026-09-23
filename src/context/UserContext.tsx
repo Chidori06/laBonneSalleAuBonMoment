@@ -5,7 +5,11 @@ export type User = {
     firstname: string,
     lastname: string,
     email: string,
-    roleId: string
+    roleId: string,
+    role?: {
+        id: number;
+        label: string;
+    };
 };
 
 

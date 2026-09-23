@@ -18,10 +18,8 @@ function LoginUser() {
 
     async function onSubmit(data) {
         try {
-            //Empêche l'email et le mot de passe en clair dans l'url
             const response = await fetch(
-                //  `http://localhost:3000/users?email=${encodeURIComponent(data.email)}&password=${encodeURIComponent(data.password)}`
-                `http://localhost:3000/api/users`
+                `http://localhost:3000/api/users?email=${encodeURIComponent(data.email)}&password=${encodeURIComponent(data.password)}`
             );
 
             if (!response.ok) {
@@ -37,23 +35,15 @@ function LoginUser() {
             }
             const user = users[0];
 
-            const roleResponse = await fetch(
-                `http://localhost:3000/roles/${user.roleId}`
-            );
+            if (!user.role?.label) {
+                console.error("Utilisateur sans rôle :", user);
+                alert("Cet utilisateur n'a pas de rôle valide");
+                return;
+            }
 
-            const role = await roleResponse.json();
+            login(user);
 
-            //On enregistre l'info du rôle
-            const userWithRole = {
-                ...user,
-                roleLabel: role.label,
-            };
-
-            //Stockage dans le contexte
-            login(userWithRole);
-
-            //Redirection
-            navigate(`/dashboard/${role.label}`);
+            navigate(`/dashboard/${user.role.label}`);
 
         } catch (error) {
             console.error(error);

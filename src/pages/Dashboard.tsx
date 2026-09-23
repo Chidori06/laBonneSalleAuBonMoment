@@ -20,10 +20,10 @@ function Dashboard() {
     // Vérification de sécurité :
     // le rôle de l'URL doit correspondre
     // au rôle de l'utilisateur.
-    if (role !== user?.roleLabel) {
+    if (role !== user?.role.label) {
         return (
             <Navigate
-                to={`/dashboard/${user?.roleLabel}`}
+                to={`/dashboard/${user?.role?.label}`}
                 replace
             />
         );
@@ -35,7 +35,7 @@ function Dashboard() {
                 Espace {role}
             </h2>
 
-            {role === "Administrateur" && (
+            {user.role.label === "Administrateur" && (
                 <div >
 
                     <div className="grid grid-cols-2 gap-5 mb-5">
@@ -73,27 +73,27 @@ function Dashboard() {
                         </div>
 
                         <Link to="/viewreservation"><button type="submit"
-                                    className="rounded-md bg-black px-3 py-2 text-sm border-[#FFFFFF] border-2 font-semibold text-white"
-                                > Mes réservations </button></Link>
+                            className="rounded-md bg-black px-3 py-2 text-sm border-[#FFFFFF] border-2 font-semibold text-white"
+                        > Mes réservations </button></Link>
 
                     </div>
                 </div>
             )}
 
-            {role === "Formateur" && (
+            {user.role.label === "Formateur" && (
                 <div>
                     <h2>
                         Espace formateur
                     </h2>
 
-                        <Link to="/viewreservation" >
+                    <Link to="/viewreservation" >
                         <button className="rounded-md bg-black px-3 py-2 text-sm border-[#FFFFFF] border-2 font-semibold text-white">Mes réservations</button>
-                        </Link>
-                
+                    </Link>
+
                 </div>
             )}
 
-            {role === "Apprenant" && (
+            {user.role.label === "Apprenant" && (
                 <div>
                     <h2>
                         Espace apprenant

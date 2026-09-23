@@ -22,11 +22,22 @@ function ReservationCard({ reservation, onChange }: ReservationCardProps) {
         onChange();
     }
 
+    function formatDate(date: string) {
+        return new Date(date).toLocaleString("fr-FR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    }
+
+
     return (
         <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
             <p className="text-sm text-gray-500">Salle : <span className="font-medium text-gray-900">{reservation.room.name}</span></p>
-            <p className="text-sm text-gray-500">Date de début : <span className="font-medium text-gray-900">{reservation.dateDebut}</span></p>
-            <p className="text-sm text-gray-500">Date de fin : <span className="font-medium text-gray-900">{reservation.dateFin}</span></p>
+            <p className="text-sm text-gray-500">Date de début : <span className="font-medium text-gray-900">{formatDate(reservation.dateDebut)}</span></p>
+            <p className="text-sm text-gray-500">Date de fin : <span className="font-medium text-gray-900">{formatDate(reservation.dateFin)}</span></p>
 
             <div className="mt-4 flex gap-2">
                 <button

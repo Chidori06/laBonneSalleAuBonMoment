@@ -9,28 +9,28 @@ import { RoomContext } from "../context/RoomContext";
 function UpdateReservation() {
 
     const context = useContext(UserContext);
-    const user = context?.user; 
+    const user = context?.user;
     const navigate = useNavigate();
-    const {getReservation,postReservation, deleteReservation,getReservationList,reservationList} = useContext(ReservationContext);
-    const {getRoom, postRoom, putRoom,deleteRoom, getRoomList,roomList,...room} = useContext(RoomContext);
-    useEffect(()=>{getRoomList()},[]);
-    useEffect(()=>{getReservationList()},[]);
+    const { getReservation, postReservation, deleteReservation, getReservationList, reservationList } = useContext(ReservationContext);
+    const { getRoom, postRoom, putRoom, deleteRoom, getRoomList, roomList, ...room } = useContext(RoomContext);
+    useEffect(() => { getRoomList() }, []);
+    useEffect(() => { getReservationList() }, []);
 
-    interface Reservation { 
-        "id"?: string, 
-        "salle_id": string,
-        "date_debut": string,
-        "date_fin": string, 
-        "user_id": string
+    interface Reservation {
+        id?: string,
+        roomId: string,
+        dateDebut: string,
+        dateFin: string,
+        userId: string
     }
 
-    const {id} = useParams();
+    const { id } = useParams();
 
     const [reservation, setReservation] = useState<Reservation | null>(null);
 
     useEffect(() => {
         const fetchReservation = async () => {
-            const response = await fetch(`http://localhost:3000/reservations/${id}`)
+            const response = await fetch(`http://localhost:3000/api/reservations/${id}`)
             const data = await response.json();
             setReservation(data)
         };
@@ -39,17 +39,29 @@ function UpdateReservation() {
     }, [id]);
 
     const [form, setForm] = useState({
-        salle_id:"",
-        date_debut:"",
-        date_fin:"",
+        roomId: "",
+        dateDebut: "",
+        dateFin: "",
     })
+
+    function formatDateForInput(date: string) {
+        const d = new Date(date);
+
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        const hours = String(d.getHours()).padStart(2, "0");
+        const minutes = String(d.getMinutes()).padStart(2, "0");
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
 
     useEffect(() => {
         if (reservation) {
             setForm({
-                salle_id: reservation.salle_id,
-                date_debut: reservation.date_debut,
-                date_fin: reservation.date_fin,
+                roomId: reservation.roomId,
+                dateDebut: formatDateForInput(reservation.dateDebut),
+                dateFin: formatDateForInput(reservation.dateFin),
             });
         }
     }, [reservation]);
@@ -57,15 +69,15 @@ function UpdateReservation() {
     function handleChange(event: ChangeEvent<HTMLInputElement>) {
         setForm({
             ...form,
-            [event.target.name]:event.target.value
+            [event.target.name]: event.target.value
         });
     }
 
     async function putReservation(id: string, donnees: Reservation) {
-        const response = await fetch(`http://localhost:3000/reservations/${id}`, {
+        const response = await fetch(`http://localhost:3000/api/reservations/${id}`, {
             method: "PUT",
             headers: {
-            "Content-Type": "application/json",
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(donnees),
         });
@@ -75,70 +87,70 @@ function UpdateReservation() {
         }
 
         return response.json();
-        }
+    }
 
     async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
 
         event.preventDefault();
 
-        if (reservation===null) {
+        if (reservation === null) {
             return;
         }
 
-        if(reservation.user_id !== user?.id && user?.roleId !== "1"){
-            navigate(`/dashboard/${user?.roleLabel}`);
+        if (reservation.userId !== user?.id && user?.roleId !== "1") {
+            navigate(`/dashboard/${user?.role?.label}`);
             return;
         }
 
         const confirmed = window.confirm("Voulez-vous vraiment modifier cette réservation ?");
-            if (!confirmed) {
+        if (!confirmed) {
             return;
-      }
+        }
 
         const newReservation = {
-            "salle_id": form.salle_id,
-            "date_debut": form.date_debut,
-            "date_fin": form.date_fin,
-            "user_id": reservation.user_id
+            roomId: form.roomId,
+            dateDebut: form.dateDebut,
+            dateFin: form.dateFin,
+            userId: reservation.userId
         };
 
-        if(typeof id === "string") {
-        await putReservation(id, newReservation);
-        window.alert("Modifications effectuées avec succès.");
+        if (typeof id === "string") {
+            await putReservation(id, newReservation);
+            window.alert("Modifications effectuées avec succès.");
         }
     }
 
-    
 
-return  <div>
-            <form onSubmit={handleSubmit}>
 
-                <div>
-                    <label>Salle</label>
-                    <select name = "salle_id" value={form.salle_id} onChange={e=>{setForm({...form,salle_id:e.target.value})}} required>
-                        {roomList.map((room)=>(
-                            <option key={room.id} value={room.id}>{room.name} / capacité : {room.capacity}</option>
-                         ))}
-                    </select>
+    return <div>
+        <form onSubmit={handleSubmit}>
 
-                </div>
+            <div>
+                <label>Salle</label>
+                <select name="roomId" value={form.roomId} onChange={e => { setForm({ ...form, roomId: e.target.value }) }} required>
+                    {roomList.map((room) => (
+                        <option key={room.id} value={room.id}>{room.name} / capacité : {room.capacity}</option>
+                    ))}
+                </select>
 
-                <div>
-                    <label>Date de début</label>
-                    <input type="datetime-local" step="3600" name = "date_debut" value={form.date_debut} onChange={handleChange} required/>
-                </div>
+            </div>
 
-                <div>
-                    <label>Date de fin</label>
-                    <input type="datetime-local" step="3600" name = "date_fin" value={form.date_fin} onChange={handleChange} required/>
-                </div>
+            <div>
+                <label>Date de début</label>
+                <input type="datetime-local" step="3600" name="dateDebut" value={form.dateDebut} onChange={handleChange} required />
+            </div>
 
-                <button type="submit">Modifier</button>
-                <button>Annuler</button>
+            <div>
+                <label>Date de fin</label>
+                <input type="datetime-local" step="3600" name="dateFin" value={form.dateFin} onChange={handleChange} required />
+            </div>
 
-            </form>
+            <button type="submit">Modifier</button>
+            <button>Annuler</button>
 
-        </div>
+        </form>
+
+    </div>
 
 };
 
