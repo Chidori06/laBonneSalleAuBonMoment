@@ -21,23 +21,47 @@ function ReservationProvider({ children }: { children?: React.ReactNode }) {
         }
     }
 
+    // async function postReservation(reservation: Reservation) {
+    //     try {
+    //         const res = await fetch(url, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify(reservation)
+    //         });
+    //         if (!res.ok) {
+    //             throw new Error("Erreur lors de la récupération");
+    //         }
+    //         const data = await res.json()
+    //     } catch (error: any) {
+    //         error && console.log("Une erreur est survenue" + error.message);
+    //     }
+    // }
+
     async function postReservation(reservation: Reservation) {
-        try {
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(reservation)
-            });
-            if (!res.ok) {
-                throw new Error("Erreur lors de la récupération");
-            }
-            const data = await res.json()
-        } catch (error: any) {
-            error && console.log("Une erreur est survenue" + error.message);
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(reservation),
+        });
+
+        const data = await res.json();
+
+        console.log("POST reservation status :", res.status);
+        console.log("POST reservation response :", data);
+
+        if (!res.ok) {
+            throw new Error(
+                data?.message || "Erreur lors de la création de la réservation"
+            );
         }
+
+        return data;
     }
+
 
     async function putReservation(id: number, reservation: Reservation) {
         try {

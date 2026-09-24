@@ -82,10 +82,6 @@ function Dashboard() {
 
             {user.role.label === "Formateur" && (
                 <div>
-                    <h2>
-                        Espace formateur
-                    </h2>
-
                     <Link to="/viewreservation" >
                         <button className="rounded-md bg-black px-3 py-2 text-sm border-[#FFFFFF] border-2 font-semibold text-white">Mes réservations</button>
                     </Link>
@@ -95,9 +91,6 @@ function Dashboard() {
 
             {user.role.label === "Apprenant" && (
                 <div>
-                    <h2>
-                        Espace apprenant
-                    </h2>
 
                     <p>
                         Mes formations,

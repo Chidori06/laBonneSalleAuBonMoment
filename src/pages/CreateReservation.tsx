@@ -5,88 +5,250 @@ import { UserContext } from "../context/UserContext";
 import { useForm } from "react-hook-form";
 import { RoomContext } from "../context/RoomContext";
 import type { User } from "../context/UserContext";
-import { redirect } from "react-router";
+import { useNavigate, Link } from "react-router";
 
 function CreateReservation() {
-  const { getReservation, postReservation, putReservation, deleteReservation, getReservationList, reservationList, ...reservation } = useContext(ReservationContext);
-  const { getRoom, postRoom, putRoom, deleteRoom, getRoomList, roomList, ...room } = useContext(RoomContext);
-  useEffect(() => { getRoomList() }, []);
-  useEffect(() => { getReservationList() }, []);
-  const { user, userList, getUserList } = useContext(UserContext);
-  useEffect(() => { getUserList() }, []);
+  const {
+    postReservation,
+    getReservationList,
+    reservationList,
+  } = useContext(ReservationContext);
+
+  const {
+    getRoomList,
+    roomList,
+  } = useContext(RoomContext);
+
+  const {
+    user,
+    userList,
+    getUserList,
+  } = useContext(UserContext);
+
+  const navigate = useNavigate();
+
   const [success, setSuccess] = useState(false);
   const [errorForm, setErrorForm] = useState("");
+
+  useEffect(() => { getRoomList(); getReservationList(); }, []);
+
+  useEffect(() => {
+    if (Number(user?.role?.id) === 1) {
+      getUserList();
+    }
+  }, [user]);
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<Reservation>();
 
-  function onSubmit(data: Reservation) {
-    let isOk = true;
-    if (new Date(data.dateDebut).getTime() > new Date(data.dateFin).getTime()) {
-      setErrorForm("Date de fin inférieur à date de début")
-      return
+  async function onSubmit(data: Reservation) {
+    setErrorForm("");
+    setSuccess(false);
+
+    if (Number(user?.role?.id) === 2) {
+      data.userId = Number(user.id);
     }
-    for (let resa of reservationList) {
-      if (data.roomId == resa.roomId) {
-        if (!((new Date(data.dateFin).getTime() <= new Date(resa.dateDebut).getTime()) || (new Date(data.dateDebut).getTime() >= new Date(resa.dateFin).getTime()))) {
-          isOk = false;
-        }
+
+    const newStart = new Date(data.dateDebut).getTime();
+    const newEnd = new Date(data.dateFin).getTime();
+
+    if (newStart >= newEnd) {
+      setErrorForm("La date de fin doit être après la date de début");
+      return;
+    }
+
+    const isRoomAvailable = reservationList.every((resa) => {
+      if (Number(data.roomId) !== Number(resa.roomId)) {
+        return true;
       }
+      const existingStart = new Date(resa.dateDebut).getTime();
+      const existingEnd = new Date(resa.dateFin).getTime();
+
+      return (
+        newEnd <= existingStart ||
+        newStart >= existingEnd
+      );
+    });
+
+    if (!isRoomAvailable) {
+      setErrorForm("Salle indisponible sur ce créneau");
+      return;
     }
-    isOk ? postReservation(data) : setErrorForm("Salle indisponible sur ce créneau");
-    isOk && setSuccess(true);
-    throw redirect("/viewreservation");
+
+    console.log("Données envoyées :", data);
+
+    try {
+      await postReservation(data);
+
+      console.log("Réservation créée avec succès");
+
+      setSuccess(true);
+
+      navigate("/viewreservation");
+    } catch (error: any) {
+      console.error("Erreur lors de la réservation :", error);
+
+      setErrorForm(
+        error?.message || "Impossible de créer la réservation"
+      );
+    }
   }
 
+
   return (
-    <>
-      <main className="min-h-screen bg-[#BCCCDB] flex flex-col items-center">
-        <h2 className="mt-14 text-center text-4xl font-extrabold uppercase text-white">Réserver un Créneau</h2>
-        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(onSubmit)() }} onClick={() => setErrorForm("")} className="mt-9 flex w-full max-w-[295px] flex flex-col">
-          <div>
-            <label>Salle</label>
-            <select id="selectmethod" defaultValue="" {...register("roomId", { required: "Salle Obligatoire" })} className="h-[30px] w-full rounded-md border border-[#A0AAAB] mb-5 border-2 bg-white">
-              {roomList.map((room) => (
-                <option key={room.id} value={room.id}>{room.name} / capacité : {room.capacity}</option>
+    <main className="min-h-screen bg-[#BCCCDB] flex flex-col items-center">
+      <Link to={`/dashboard/${user.role.label}`} >
+        <button className="rounded-md bg-black px-3 py-2 text-sm border-[#FFFFFF] border-2 font-semibold text-white">Retour</button>
+      </Link>
+
+      <h2 className="mt-14 text-center text-4xl font-extrabold uppercase text-white">
+        Réserver un créneau
+      </h2>
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        onClick={() => setErrorForm("")}
+        className="mt-9 flex w-full max-w-[295px] flex-col"
+      >
+
+        <div>
+          <label>Salle</label>
+
+          <select
+            defaultValue=""
+            {...register("roomId", {
+              required: "Salle obligatoire",
+              valueAsNumber: true
+            })}
+            className="h-[30px] w-full rounded-md border-2 border-[#A0AAAB] mb-5 bg-white"
+          >
+            <option value="" disabled>
+              Sélectionner une salle
+            </option>
+
+            {roomList.map((room) => (
+              <option
+                key={room.id}
+                value={room.id}
+              >
+                {room.name} / capacité : {room.capacity}
+              </option>
+            ))}
+          </select>
+
+          {errors.roomId && (
+            <p className="text-black font-bold text-sm">
+              {errors.roomId.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label>Utilisateur</label>
+
+          {Number(user?.role?.id) === 1 && (
+            <select
+              defaultValue=""
+              {...register("userId", {
+                required: "Utilisateur obligatoire",
+                valueAsNumber: true
+              })}
+              className="h-[30px] w-full rounded-md border-2 border-[#A0AAAB] mb-5 bg-white"
+            >
+              <option value="" disabled>
+                Sélectionner un utilisateur
+              </option>
+
+              {userList.map((userItem: User) => (
+                <option
+                  key={userItem.id}
+                  value={userItem.id}
+                >
+                  {userItem.firstname} {userItem.lastname}
+                </option>
               ))}
             </select>
-            {errors.roomId && (<p className="text-black-500 font-bold text-sm">{errors.roomId.message}</p>)}
-          </div>
-          <div>
-            <label>Utilisateur</label>
-            {user != null && user.roleId == "1" && <select id="selectmethod" defaultValue="" {...register("userId", { required: "Utilisateur Obligatoire" })} className="h-[30px] w-full rounded-md border border-[#A0AAAB] mb-5 border-2 bg-white">
-              {userList.map((user: User) => (
-                <option key={user.id} value={user.id}>{user.firstname} {user.lastname}</option>
-              ))}
-            </select>}
-            {user != null && user.roleId == "2" && <select id="selectmethod" defaultValue="" {...register("userId", { required: "Utilisateur Obligatoire" })} className="h-[30px] w-full rounded-md border border-[#A0AAAB] mb-5 border-2 bg-white">
-              <option value={user.id}>{user.firstname} {user.lastname}</option>
-            </select>}
-            {errors.userId && (<p className="text-black-500 font-bold text-sm">{errors.userId.message}</p>)}
-          </div>
-          <div>
-            <label>Date début</label>
-            <input type="datetime-local" step="3600" {...register("dateDebut", { required: "Date début obligatoire" })} className="h-[30px] w-full rounded-md border border-[#A0AAAB] mb-5 border-2 bg-white" />
-            {errors.dateDebut && (<p className="text-black-500 font-bold text-sm">{errors.dateDebut.message}</p>)}
-          </div>
-          <div>
-            <label>Date fin</label>
-            <input type="datetime-local" step="3600" {...register("dateFin", { required: "Date fin obligatoire" })} className="h-[30px] w-full rounded-md border border-[#A0AAAB] mb-5 border-2 bg-white" />
-            {errors.dateFin && (<p className="text-black-500 font-bold text-sm">{errors.dateFin.message}</p>)}
-          </div>
-          <p className="text-black-500 font-bold text-sm">{errorForm}</p>
-          <button type="submit" disabled={!isValid} className="rounded-md bg-black px-3 py-2 text-sm border-[#FFFFFF] border-2 font-semibold text-white disabled:opacity-40 disabled:cursor-not-allowed">Réserver un créneau</button>
-          {success && (
-            <div className="flex items-center gap-2 rounded-lg bg-green-600 px-5 py-3 text-white shadow-lg">
-              <span>✓ Créneau réservé avec succès !</span>
-            </div>
           )}
-        </form>
-      </main>
-    </>
+
+          {Number(user?.role?.id) === 2 && (
+            <input
+              type="text"
+              value={`${user.firstname} ${user.lastname}`}
+              disabled
+              className="h-[30px] w-full rounded-md border-2 border-[#A0AAAB] mb-5 bg-gray-200"
+            />
+          )}
+
+          {errors.userId && (
+            <p className="text-black font-bold text-sm">
+              {errors.userId.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label>Date début</label>
+
+          <input
+            type="datetime-local"
+            step="3600"
+            {...register("dateDebut", {
+              required: "Date début obligatoire",
+            })}
+            className="h-[30px] w-full rounded-md border-2 border-[#A0AAAB] mb-5 bg-white"
+          />
+
+          {errors.dateDebut && (
+            <p className="text-black font-bold text-sm">
+              {errors.dateDebut.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label>Date fin</label>
+
+          <input
+            type="datetime-local"
+            step="3600"
+            {...register("dateFin", {
+              required: "Date fin obligatoire",
+            })}
+            className="h-[30px] w-full rounded-md border-2 border-[#A0AAAB] mb-5 bg-white"
+          />
+
+          {errors.dateFin && (
+            <p className="text-black font-bold text-sm">
+              {errors.dateFin.message}
+            </p>
+          )}
+        </div>
+
+        {errorForm && (
+          <p className="text-black font-bold text-sm mb-3">
+            {errorForm}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          className="rounded-md bg-black px-3 py-2 text-sm border-2 border-white font-semibold text-white"
+        >
+          Réserver un créneau
+        </button>
+
+        {success && (
+          <div className="flex items-center gap-2 rounded-lg bg-green-600 px-5 py-3 text-white shadow-lg mt-3">
+            <span>
+              ✓ Créneau réservé avec succès !
+            </span>
+          </div>
+        )}
+      </form>
+    </main>
   );
 }
 
