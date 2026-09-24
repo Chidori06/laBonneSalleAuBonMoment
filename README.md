@@ -73,3 +73,6 @@ export default defineConfig([
 ])
 
 ```
+
+## Démarrage du serveur :
+npm run dev
