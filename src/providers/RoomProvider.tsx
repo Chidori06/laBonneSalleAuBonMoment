@@ -27,23 +27,29 @@ function RoomProvider({ children }: { children?: React.ReactNode }) {
 
     async function putRoom(id: string, room: Room) {
         const res = await fetch((url + "/" + id), {
-            method: 'PUT',
+            method: "PATCH",
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json",
             },
-            body: JSON.stringify(room)
+            body: JSON.stringify(room),
         });
-        const data = await res.json()
+
+        if (!res.ok) {
+            throw new Error("Erreur lors de la modification de la salle");
+        }
+        const data = await res.json();
+        await getRoomList();
+        return data;
     }
 
     async function deleteRoom(id: string) {
         const res = await fetch((url + "/" + id), {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            method: "DELETE",
         });
-        const data = await res.json()
+        if (!res.ok) {
+            throw new Error("Impossible de supprimer cette salle car elle possède des réservations.");
+        }
+        await getRoomList();
     }
 
     async function getRoomList() {
@@ -53,7 +59,7 @@ function RoomProvider({ children }: { children?: React.ReactNode }) {
     }
 
     return (
-        <RoomContext.Provider value={{ getRoom, postRoom, putRoom, deleteRoom, getRoomList, roomList, ...room }}>
+        <RoomContext.Provider value={{ room, getRoom, postRoom, putRoom, deleteRoom, getRoomList, roomList, ...room }}>
             {children}
         </RoomContext.Provider>
     );

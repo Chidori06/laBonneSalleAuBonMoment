@@ -1,5 +1,6 @@
 import { useState } from "react";
-import {useForm} from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { Link } from "react-router";
 
 
 function CreateRoom() {
@@ -16,15 +17,15 @@ function CreateRoom() {
 
     function handleSubmit(event) {
         event.preventDefault();
-console.log(form?.name);
-        if (form?.name == undefined || form?.name.length < 5 ) {
+        console.log(form?.name);
+        if (form?.name == undefined || form?.name.length < 5) {
             setError("Le nom de la salle est obligatoire et doit comporter au moins 5 caractères");
             return;
         }
 
         if (form?.capacity == undefined || form?.capacity == 0) {
-             setError("La capacité de la salle doit être supérieure à 0");
-             return;
+            setError("La capacité de la salle doit être supérieure à 0");
+            return;
         }
 
         setError("");

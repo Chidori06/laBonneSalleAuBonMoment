@@ -77,13 +77,8 @@ function CreateReservation() {
       setErrorForm("Salle indisponible sur ce créneau");
       return;
     }
-
-    console.log("Données envoyées :", data);
-
     try {
       await postReservation(data);
-
-      console.log("Réservation créée avec succès");
 
       setSuccess(true);
 

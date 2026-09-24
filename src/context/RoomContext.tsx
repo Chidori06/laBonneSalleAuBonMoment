@@ -5,10 +5,11 @@ export type Room = {
     id: string,
     name: string,
     capacity: number,
-    reservations: Reservation
+    reservations?: Reservation[]
 }
 
 export interface RoomContextType extends Room {
+    room: Room | null;
     getRoom: (id: string) => void;
     postRoom: (room: Room) => void;
     putRoom: (id: string, room: Room) => void;

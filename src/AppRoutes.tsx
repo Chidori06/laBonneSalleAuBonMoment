@@ -9,6 +9,7 @@ import ViewReservation from "./pages/viewReservations";
 import NewRoom from "./pages/NewRoom";
 import UserList from "./pages/UserList";
 import RoomList from "./pages/RoomList";
+import EditRoom from "./pages/EditRoom";
 
 function AppRoutes() {
     return (
@@ -17,6 +18,7 @@ function AppRoutes() {
             <Route element={<ProtectedRoute />}>
                 <Route path="/dashboard/:role" element={<Dashboard />} />
                 <Route path="/NewRoom" element={<NewRoom />} />
+                <Route path="/editroom/:id" element={<EditRoom />} />
                 <Route path="/signin" element={<FormCompte />} />
                 <Route path="/createreservation" element={<CreateReservation />} />
                 <Route path="/viewreservation" element={<ViewReservation />} />

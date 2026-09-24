@@ -14,7 +14,7 @@ function RoomList() {
         <h1>Liste des salles</h1>
         <ul>
           {roomList.map((room) => (
-            <RoomCard key={room.id} salle={room} />
+            <RoomCard key={room.id} room={room} />
           ))}
         </ul>{" "}
       </div>
