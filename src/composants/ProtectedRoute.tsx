@@ -5,7 +5,12 @@ import { UserContext } from "../context/UserContext";
 function ProtectedRoute() {
     const context = useContext(UserContext);
 
-    const { user } = context;
+    const { user, loading } = context;
+
+    //Chargement
+    if (loading) {
+        return <div>Chargement...</div>;
+    }
 
     // Pas connecté
     if (!user) {

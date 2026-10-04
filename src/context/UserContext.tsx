@@ -16,7 +16,8 @@ export type User = {
 type UserContextType = {
     user: User | null;
     login: (user: User) => void;
-    logout: () => void;
+    loading: boolean;
+    logout: () => Promise<void>;
     userList: User[];
     getUserList: () => void;
 };

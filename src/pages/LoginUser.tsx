@@ -3,6 +3,11 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { UserContext } from "../context/UserContext";
 
+type LoginFormData = {
+    email: string;
+    password: string;
+};
+
 function LoginUser() {
 
     const context = useContext(UserContext);
@@ -12,34 +17,40 @@ function LoginUser() {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm();
+    } = useForm<LoginFormData>();
 
     const { login } = context;
 
-    async function onSubmit(data) {
+    async function onSubmit(data: LoginFormData) {
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/users?email=${encodeURIComponent(data.email)}&password=${encodeURIComponent(data.password)}`
+            const response = await fetch("http://localhost:3000/api/auth/login",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        email: data.email,
+                        password: data.password,
+                    }),
+                }
             );
 
+            const result = await response.json();
+
             if (!response.ok) {
-                throw new Error("Erreur lors de la connexion");
+                if (response.status === 401) {
+                    alert("Identifiants incorrects");
+                    return;
+                }
+
+                throw new Error(
+                    result.message || "Erreur lors de la connexion"
+                );
             }
 
-            const users = await response.json();
-
-            // Aucun utilisateur trouvé
-            if (users.length === 0) {
-                alert("Identifiants incorrects");
-                return;
-            }
-            const user = users[0];
-
-            if (!user.role?.label) {
-                console.error("Utilisateur sans rôle :", user);
-                alert("Cet utilisateur n'a pas de rôle valide");
-                return;
-            }
+            const user = result.user;
 
             login(user);
 
@@ -50,6 +61,7 @@ function LoginUser() {
             alert("Une erreur est survenue");
         }
     }
+
     return (
         <>
             <main className="min-h-screen bg-[#BCCCDB] flex flex-col items-center">
