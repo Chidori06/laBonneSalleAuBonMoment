@@ -12,11 +12,19 @@ export type Reservation = {
     room: Room;
 }
 
+export type UpdateReservation = {
+    roomId: string;
+    dateDebut: string;
+    dateFin: string;
+    userId: string;
+};
+
+
 
 export interface ReservationContextType extends Reservation {
     getReservation: (id: number) => void;
     postReservation: (reservation: Reservation) => void;
-    putReservation: (id: number, reservation: Reservation) => void;
+    putReservation: (id: number, reservation: UpdateReservation) => void;
     deleteReservation: (id: number) => void;
     getReservationList: () => void;
     reservationList: Reservation[];

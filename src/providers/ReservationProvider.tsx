@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ReservationContext } from "../context/ReservationContext";
-import type { Reservation } from "../context/ReservationContext";
+import type { Reservation, UpdateReservation } from "../context/ReservationContext";
+
 
 function ReservationProvider({ children }: { children?: React.ReactNode }) {
 
@@ -44,24 +45,30 @@ function ReservationProvider({ children }: { children?: React.ReactNode }) {
         return data;
     }
 
+    async function putReservation(id: number, reservation: UpdateReservation) {
 
-    async function putReservation(id: number, reservation: Reservation) {
-        try {
-            const res = await fetch((url + "/" + id), {
-                method: 'PATCH',
-                credentials: "include",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(reservation)
-            });
-            if (!res.ok) {
-                throw new Error("Erreur lors de la récupération");
-            }
-            const data = await res.json()
-        } catch (error: any) {
-            error && console.log("Une erreur est survenue" + error.message);
+        const res = await fetch(url + "/" + id, {
+            method: "PATCH",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(reservation),
+        });
+
+        console.log("STATUS :", res.status);
+
+        const data = await res.json();
+
+        console.log("RESPONSE :", data);
+
+        if (!res.ok) {
+            throw new Error(
+                data?.message || "Erreur lors de la modification"
+            );
         }
+
+        return data;
     }
 
     async function deleteReservation(id: number) {

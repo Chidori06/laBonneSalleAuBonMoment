@@ -7,8 +7,7 @@ import { Link } from "react-router";
 
 
 function ViewReservation() {
-    const { user, userList, getUserList } = useContext(UserContext);
-    useEffect(() => { getUserList() }, []);
+    const { user } = useContext(UserContext);
     const { getReservation, postReservation, putReservation, deleteReservation, getReservationList, reservationList, ...reservation } = useContext(ReservationContext);
     useEffect(() => { getReservationList() }, []);
     const [userReservationList, setUserReservationList] = useState<Reservation[]>([]);
@@ -16,12 +15,14 @@ function ViewReservation() {
         if (!user) {
             return;
         }
-        reservationList.forEach((res) => {
-            if (res.userId == user.id) {
-                setUserReservationList([...userReservationList, res])
-            }
-        })
-    }, [reservationList])
+
+        const userReservations = reservationList.filter(
+            (res) => Number(res.userId) === Number(user.id)
+        );
+
+        setUserReservationList(userReservations);
+    }, [reservationList, user]);
+
 
     return (
         <>

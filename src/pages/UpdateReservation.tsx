@@ -11,7 +11,7 @@ function UpdateReservation() {
     const context = useContext(UserContext);
     const user = context?.user;
     const navigate = useNavigate();
-    const { getReservation, postReservation, deleteReservation, getReservationList, reservationList } = useContext(ReservationContext);
+    const { getReservation, postReservation, deleteReservation, putReservation, getReservationList, reservationList } = useContext(ReservationContext);
     const { getRoom, postRoom, putRoom, deleteRoom, getRoomList, roomList, ...room } = useContext(RoomContext);
     useEffect(() => { getRoomList() }, []);
     useEffect(() => { getReservationList() }, []);
@@ -30,7 +30,9 @@ function UpdateReservation() {
 
     useEffect(() => {
         const fetchReservation = async () => {
-            const response = await fetch(`http://localhost:3000/api/reservations/${id}`)
+            const response = await fetch(`http://localhost:3000/api/reservations/${id}`, {
+                credentials: "include",
+            })
             const data = await response.json();
             setReservation(data)
         };
@@ -73,36 +75,27 @@ function UpdateReservation() {
         });
     }
 
-    async function putReservation(id: string, donnees: Reservation) {
-        const response = await fetch(`http://localhost:3000/api/reservations/${id}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(donnees),
-        });
-
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP : ${response.status}`);
-        }
-
-        return response.json();
-    }
-
-    async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
-
+    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        if (reservation === null) {
+        console.log("SUBMIT");
+
+        if (!reservation) {
+            console.log("Pas de réservation");
             return;
         }
+        const isAdmin = user?.role?.label === "Administrateur";
+        const isOwner = Number(reservation.userId) === Number(user?.id);
 
-        if (reservation.userId !== user?.id && user?.roleId !== "1") {
+        if (!isAdmin && !isOwner) {
             navigate(`/dashboard/${user?.role?.label}`);
             return;
         }
 
-        const confirmed = window.confirm("Voulez-vous vraiment modifier cette réservation ?");
+        const confirmed = window.confirm(
+            "Voulez-vous vraiment modifier cette réservation ?"
+        );
+
         if (!confirmed) {
             return;
         }
@@ -111,14 +104,24 @@ function UpdateReservation() {
             roomId: form.roomId,
             dateDebut: form.dateDebut,
             dateFin: form.dateFin,
-            userId: reservation.userId
+            userId: reservation.userId,
         };
 
-        if (typeof id === "string") {
-            await putReservation(id, newReservation);
+        console.log("Avant PATCH", newReservation);
+
+        try {
+            await putReservation(Number(id), newReservation);
+
+            console.log("PATCH terminé");
+
             window.alert("Modifications effectuées avec succès.");
+            navigate("/viewreservation");
+        } catch (error: any) {
+            console.error("Erreur PATCH :", error);
+            window.alert(error.message);
         }
     }
+
 
 
 
@@ -144,9 +147,18 @@ function UpdateReservation() {
                 <label>Date de fin</label>
                 <input type="datetime-local" step="3600" name="dateFin" value={form.dateFin} onChange={handleChange} required />
             </div>
+            <button type="submit">
+                Modifier
+            </button>
 
-            <button type="submit">Modifier</button>
-            <button>Annuler</button>
+            <button
+                type="button"
+                onClick={() => navigate("/viewreservation")}
+            >
+                Annuler
+            </button>
+
+
 
         </form>
 
