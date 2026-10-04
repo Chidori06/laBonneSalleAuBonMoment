@@ -10,7 +10,9 @@ function ReservationProvider({ children }: { children?: React.ReactNode }) {
 
     async function getReservation(id: number) {
         try {
-            const res = await fetch(url + "/" + id);
+            const res = await fetch(url + "/" + id, {
+                credentials: "include",
+            });
             const data = await res.json();
             if (!res.ok) {
                 throw new Error("Erreur lors de la récupération");
@@ -24,6 +26,7 @@ function ReservationProvider({ children }: { children?: React.ReactNode }) {
     async function postReservation(reservation: Reservation) {
         const res = await fetch(url, {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -45,7 +48,8 @@ function ReservationProvider({ children }: { children?: React.ReactNode }) {
     async function putReservation(id: number, reservation: Reservation) {
         try {
             const res = await fetch((url + "/" + id), {
-                method: 'PUT',
+                method: 'PATCH',
+                credentials: "include",
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -64,6 +68,7 @@ function ReservationProvider({ children }: { children?: React.ReactNode }) {
         try {
             const res = await fetch(url + "/" + id, {
                 method: "DELETE",
+                credentials: "include",
             });
 
             if (!res.ok) {
@@ -82,11 +87,13 @@ function ReservationProvider({ children }: { children?: React.ReactNode }) {
 
     async function getReservationList() {
         try {
-            const res = await fetch(url);
+            const res = await fetch(url, {
+                credentials: "include",
+            });
+            const data = await res.json();
             if (!res.ok) {
                 throw new Error("Erreur lors de la récupération");
             }
-            const data = await res.json();
             setReservationList(data);
         } catch (error: any) {
             error && console.log("Une erreur est survenue" + error.message);

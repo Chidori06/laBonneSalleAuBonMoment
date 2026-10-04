@@ -9,7 +9,9 @@ function RoomProvider({ children }: { children?: React.ReactNode }) {
     const url = 'http://localhost:3000/api/rooms';
 
     async function getRoom(id: string) {
-        const res = await fetch(url + "/" + id);
+        const res = await fetch(url + "/" + id, {
+            credentials: "include",
+        });
         const data = await res.json();
         setRoom(data);
     }
@@ -17,6 +19,7 @@ function RoomProvider({ children }: { children?: React.ReactNode }) {
     async function postRoom(room: Room) {
         const res = await fetch(url, {
             method: 'POST',
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -28,6 +31,7 @@ function RoomProvider({ children }: { children?: React.ReactNode }) {
     async function putRoom(id: string, room: Room) {
         const res = await fetch((url + "/" + id), {
             method: "PATCH",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -45,6 +49,7 @@ function RoomProvider({ children }: { children?: React.ReactNode }) {
     async function deleteRoom(id: string) {
         const res = await fetch((url + "/" + id), {
             method: "DELETE",
+            credentials: "include",
         });
         if (!res.ok) {
             throw new Error("Impossible de supprimer cette salle car elle possède des réservations.");
@@ -53,7 +58,9 @@ function RoomProvider({ children }: { children?: React.ReactNode }) {
     }
 
     async function getRoomList() {
-        const res = await fetch(url);
+        const res = await fetch(url, {
+            credentials: "include",
+        });
         const data = await res.json();
         setRoomList(data);
     }
