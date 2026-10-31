@@ -1,6 +1,9 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
 function FormCompte() {
     const checkEmailAvailable = async (email: string) => {
@@ -43,6 +46,7 @@ function FormCompte() {
     } = useForm({
         resolver: zodResolver(compteSchema),
     });
+    const { user } = useContext(UserContext);
 
     async function onSubmit(data) {
         try {
@@ -67,65 +71,147 @@ function FormCompte() {
 
     return (
         <>
-            <div className="min-h-screen bg-[#BCCCDB] flex flex-col items-center">
+            <main className="min-h-screen bg-[#111110] px-5 py-12">
+                {/* Bouton retour */}
+                <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-4">
+                    <Link
+                        to={`/dashboard/${user.role.label}`}
+                        className="inline-flex items-center gap-2 rounded-lg border border-[#51452E] bg-[#1B1B19] px-4 py-2 text-sm font-medium text-[#C5AC7B] transition duration-300 hover:border-[#B69A65] hover:bg-[#24221D] hover:text-[#E4D5B5]"
+                    >
+                        <span>←</span>
+                        Retour
+                    </Link>
+                </div>
+                <div className="mx-auto mt-6 w-full max-w-md">
+                    {/* Titre */}
+                    <div className="mb-10 text-center">
+                        <h1 className="text-3xl font-medium tracking-wide text-[#E4D5B5]">
+                            Création de compte
+                        </h1>
 
-                <h2 className="text-center text-4xl font-bold uppercase text-black">Création de compte</h2>
-                <div>
-                    <form className="flex flex-col items-center justify-center p-6 space-y-8 min-h-screen p-3" onSubmit={handleSubmit(onSubmit)}>
-                        <div className="flex flex-col items-center gap-2" >
-                            <div className="flex items-center gap-6">
-                                <label className="text-black bg-[#D9D9D9] p-2 w-[84px]" >Nom</label>
-                                <input type="text" className="h-[30px] w-full rounded-md border border-[#A0AAAB] mb-5 border-2 bg-white"
-                                    {...register("lastname", { required: true })} />
-                            </div>
-                            {errors.lastname && <p>{errors.lastname.message}</p>}
-                        </div>
-                        <div><div className="flex items-center gap-6">
+                        <div className="mx-auto mt-4 h-px w-12 bg-[#B69A65]" />
 
-                            <label className="text-black bg-[#D9D9D9] p-2 w-[84px]" >Prénom</label>
-                            <input type="text" className="h-[30px] w-full rounded-md border border-[#A0AAAB] mb-5 border-2 bg-white" {...register("firstname")} />
-                        </div>
-                            {errors.firstname && <p>{errors.firstname.message}</p>}
-
-                        </div>
-
+                        <p className="mt-4 text-sm text-[#92866F]">
+                            Informations du nouvel utilisateur
+                        </p>
+                    </div>
+                    {/* Formulaire */}
+                    <form
+                        onSubmit={handleSubmit(onSubmit)}
+                        className="flex flex-col gap-5 rounded-xl border border-[#39362E] bg-[#1B1B19] p-6 shadow-lg"
+                    >
+                        {/* Nom */}
                         <div>
-                            <div className="flex items-center gap-6">
-                                <label className="text-black bg-[#D9D9D9] p-2 w-[84px]" >Email</label>
-                                <input type="email" className="h-[30px] w-full rounded-md border border-[#A0AAAB] mb-5 border-2 bg-white"{...register("email")} />
-                            </div>
-                            {errors.email && (<p>{errors.email.message}</p>)}
-                        </div>
+                            <label className="mb-2 block text-xs font-medium uppercase tracking-widest text-[#C5AC7B]">
+                                Nom
+                            </label>
 
+                            <input
+                                type="text"
+                                placeholder="Votre nom"
+                                className="h-12 w-full rounded-lg border border-[#51452E] bg-[#111110] px-4 text-sm text-[#E4D5B5] placeholder:text-[#777267] outline-none transition focus:border-[#B69A65] focus:ring-1 focus:ring-[#B69A65]/30"
+                                {...register("lastname", { required: true })}
+                            />
+
+                            {errors.lastname && (
+                                <p className="mt-2 text-xs text-[#D99585]">
+                                    {errors.lastname.message}
+                                </p>
+                            )}
+                        </div>
+                        {/* Prénom */}
                         <div>
-                            <div className="flex items-center gap-6">
+                            <label className="mb-2 block text-xs font-medium uppercase tracking-widest text-[#C5AC7B]">
+                                Prénom
+                            </label>
 
-                                <label className="text-black bg-[#D9D9D9] p-2 w-[84px]" >Mot de passe</label>
-                                <input type="password" className="h-[30px] w-full rounded-md border border-[#A0AAAB] mb-5 border-2 bg-white" {...register("password")} />
-                            </div>
-                            {errors.password && (<p>{errors.password.message}</p>)}
+                            <input
+                                type="text"
+                                placeholder="Votre prénom"
+                                className="h-12 w-full rounded-lg border border-[#51452E] bg-[#111110] px-4 text-sm text-[#E4D5B5] placeholder:text-[#777267] outline-none transition focus:border-[#B69A65] focus:ring-1 focus:ring-[#B69A65]/30"
+                                {...register("firstname")}
+                            />
+
+                            {errors.firstname && (
+                                <p className="mt-2 text-xs text-[#D99585]">
+                                    {errors.firstname.message}
+                                </p>
+                            )}
                         </div>
+                        {/* Email */}
                         <div>
-                            <div className="flex items-center gap-6">
-                                <label className="text-black bg-[#D9D9D9] p-2 w-[84px]">Rôle:</label>
-                                <div>
+                            <label className="mb-2 block text-xs font-medium uppercase tracking-widest text-[#C5AC7B]">
+                                Email
+                            </label>
 
-                                    <select id="roleId" className="h-[30px] w-full rounded-md border border-[#A0AAAB] mb-5 border-2 bg-white"  {...register('roleId')}>
-                                        <option value="">Select...</option>
-                                        <option value="2">Formateur</option>
-                                        <option value="1">Administrateur</option>
-                                        <option value="3">Apprenant</option>
-                                    </select>
-                                    {errors.roleId && (<p>{errors.roleId.message}</p>)}
+                            <input
+                                type="email"
+                                placeholder="Votre adresse email"
+                                className="h-12 w-full rounded-lg border border-[#51452E] bg-[#111110] px-4 text-sm text-[#E4D5B5] placeholder:text-[#777267] outline-none transition focus:border-[#B69A65] focus:ring-1 focus:ring-[#B69A65]/30"
+                                {...register("email")}
+                            />
 
-                                </div>
-                            </div>
+                            {errors.email && (
+                                <p className="mt-2 text-xs text-[#D99585]">
+                                    {errors.email.message}
+                                </p>
+                            )}
                         </div>
-                        <button type="submit" className="w-44 text-white bg-black border-2 border-white rounded-xl p-2" > Valider </button>
+                        {/* Mot de passe */}
+                        <div>
+                            <label className="mb-2 block text-xs font-medium uppercase tracking-widest text-[#C5AC7B]">
+                                Mot de passe
+                            </label>
+
+                            <input
+                                type="password"
+                                placeholder="Votre mot de passe"
+                                className="h-12 w-full rounded-lg border border-[#51452E] bg-[#111110] px-4 text-sm text-[#E4D5B5] placeholder:text-[#777267] outline-none transition focus:border-[#B69A65] focus:ring-1 focus:ring-[#B69A65]/30"
+                                {...register("password")}
+                            />
+
+                            {errors.password && (
+                                <p className="mt-2 text-xs text-[#D99585]">
+                                    {errors.password.message}
+                                </p>
+                            )}
+                        </div>
+                        {/* Rôle */}
+                        <div>
+                            <label className="mb-2 block text-xs font-medium uppercase tracking-widest text-[#C5AC7B]">
+                                Rôle
+                            </label>
+
+                            <select
+                                id="roleId"
+                                className="h-12 w-full rounded-lg border border-[#51452E] bg-[#111110] px-4 text-sm text-[#E4D5B5] outline-none transition focus:border-[#B69A65] focus:ring-1 focus:ring-[#B69A65]/30"
+                                {...register("roleId")}
+                            >
+                                <option value="">Sélectionner un rôle</option>
+                                <option value="2">Formateur</option>
+                                <option value="1">Administrateur</option>
+                                <option value="3">Apprenant</option>
+                            </select>
+
+                            {errors.roleId && (
+                                <p className="mt-2 text-xs text-[#D99585]">
+                                    {errors.roleId.message}
+                                </p>
+                            )}
+                        </div>
+                        {/* Bouton */}
+                        <button
+                            type="submit"
+                            className="mt-3 h-12 rounded-lg bg-[#B69A65] text-sm font-semibold tracking-wide text-[#171612] transition duration-300 hover:bg-[#D0B982] hover:shadow-[0_0_18px_rgba(182,154,101,0.15)] active:scale-[0.98]"
+                        >
+                            Créer le compte
+                        </button>
+
                     </form>
                 </div>
-            </div>
+            </main>
         </>
+
     );
 }
 export default FormCompte;

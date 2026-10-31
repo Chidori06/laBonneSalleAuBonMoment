@@ -64,33 +64,61 @@ function LoginUser() {
 
     return (
         <>
-            <main className="min-h-screen bg-[#BCCCDB] flex flex-col items-center">
-                <h2 className="mt-14 text-center text-4xl font-extrabold uppercase text-white">
-                    Page de connexion
-                </h2>
-                <form onSubmit={handleSubmit(onSubmit)}
-                    className="mt-9 flex w-full max-w-[295px] flex flex-col">
-                    <div>
-                        <input type="email"
-                            className="h-[30px] w-full rounded-md border border-[#A0AAAB] mb-5 border-2 bg-white"
-                            placeholder="Identifiants ou adresse mail"
-                            {...register("email",
-                                { required: "L'email est obligatoire", })} />
-                        {errors.email && (<p className="text-xs text-red-600 mb-5">{errors.email.message}</p>)}
-                    </div>
-                    <div>
-                        <input type="password"
-                            className="h-[30px] w-full rounded-md border border-[#A0AAAB] mb-5 border-2 bg-white"
-                            placeholder="Mot de passe"
-                            {...register("password",
-                                { required: "Le mot de passe est obligatoire", })} />
-                        {errors.password && (<p className="text-xs text-red-600 mb-5">{errors.password.message}</p>)}
-                    </div>
-                    <button type="submit"
-                        className="rounded-md bg-black px-3 py-2 text-sm border-[#FFFFFF] border-2 font-semibold text-white"
-                    > Se connecter </button>
-                </form>
-            </main >
+            <main className="min-h-screen bg-[#111110] flex flex-col items-center px-5">
+                <div className="mt-28 w-full max-w-[340px]">
+                    <h2 className="text-center text-3xl font-medium tracking-wide text-[#E4D5B5]">
+                        Connexion
+                    </h2>
+                    <div className="mx-auto mt-4 mb-10 h-px w-12 bg-[#B69A65]" />
+                    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+                        <div>
+                            <label className="mb-2 block text-xs uppercase tracking-widest text-[#C5AC7B]">
+                                Adresse mail
+                            </label>
+
+                            <input
+                                type="email"
+                                placeholder="Votre adresse mail"
+                                className="h-12 w-full rounded-lg border border-[#39362E] bg-[#1B1B19] px-4 text-sm text-[#E4D5B5] placeholder:text-[#777267] outline-none transition focus:border-[#B69A65] focus:ring-1 focus:ring-[#B69A65]/30"
+                                {...register("email", {
+                                    required: "L'email est obligatoire",
+                                })}
+                            />
+
+                            {errors.email && (
+                                <p className="mt-2 text-xs text-red-400">
+                                    {errors.email.message}
+                                </p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="mb-2 block text-xs uppercase tracking-widest text-[#C5AC7B]">
+                                Mot de passe
+                            </label>
+
+                            <input
+                                type="password"
+                                placeholder="Votre mot de passe"
+                                className="h-12 w-full rounded-lg border border-[#39362E] bg-[#1B1B19] px-4 text-sm text-[#E4D5B5] placeholder:text-[#777267] outline-none transition focus:border-[#B69A65] focus:ring-1 focus:ring-[#B69A65]/30"
+                                {...register("password", {
+                                    required: "Le mot de passe est obligatoire",
+                                })}
+                            />
+
+                            {errors.password && (
+                                <p className="mt-2 text-xs text-red-400">
+                                    {errors.password.message}
+                                </p>
+                            )}
+                        </div>
+
+                        <button type="submit" className="mt-3 h-12 rounded-lg bg-[#B69A65] text-sm font-semibold tracking-wide text-[#171612] transition duration-300 hover:bg-[#D0B982] hover:shadow-[0_0_18px_rgba(182,154,101,0.15)] active:scale-[0.98]"
+                        >Se connecter</button>
+
+                    </form>
+                </div>
+            </main>
         </>
     )
 }
